@@ -13,6 +13,7 @@
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <cstdlib>
+#include <iterator>
 #include <optional>
 #include <cmath>
 
@@ -54,6 +55,12 @@ int main() {
     PlayButton.setCharacterSize(24);
     PlayButton.setFillColor(sf::Color::White);
     PlayButton.setPosition({650.f, 250.f});
+
+    sf::Text BackButton(font);
+    BackButton.setCharacterSize(24);
+    BackButton.setString(">");
+    BackButton.setPosition({5.f, 5.f});
+    BackButton.setFillColor(sf::Color::White);
 
     sf::Text TitleText(font);
     TitleText.setString("#Include <Pong>");
@@ -120,6 +127,20 @@ int main() {
                     state = GameState::Credits;
                 }
             }
+
+            if (state == GameState::Credits && event->is<sf::Event::MouseButtonPressed>()) {
+                auto mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                if (BackButton.getGlobalBounds().contains(mousePosition)) {
+                    state = GameState::Menu;
+                }
+            }
+
+            if (state == GameState::Playing && event->is<sf::Event::MouseButtonPressed>()) {
+                auto mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                if (BackButton.getGlobalBounds().contains(mousePosition)) {
+                    state = GameState::Menu;
+                }
+            }
         }
 
 
@@ -158,12 +179,14 @@ int main() {
         if (state == GameState::Credits) {
             window.draw(CreditsText);
             window.draw(StudioProfileArt);
+            window.draw(BackButton);
         }
 
         if (state == GameState::Playing) {
            window.draw(Left_Paddle);
            window.draw(Right_Paddle);
            window.draw(Ball);
+           window.draw(BackButton);
            Ball.move(velocity);
         }
 
