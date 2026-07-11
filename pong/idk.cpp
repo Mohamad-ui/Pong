@@ -13,9 +13,11 @@
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <cstdlib>
+#include <random>
 #include <iterator>
 #include <optional>
 #include <cmath>
+#include <vector>
 
 enum class GameState {
     Menu,
@@ -26,7 +28,18 @@ enum class GameState {
     Paused
 };
 
+struct Particle {
+    sf::CircleShape Particles;
+    sf::Vector2f velocity;
+    float lifetime;
+};
+
 int main() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> distrib(0.3, 2.0);
+    int RandomParticleRadius = distrib(gen);
+
     GameState state = GameState::Menu;
     sf::Font font;
     sf::Vector2f velocity(5.f, 5.f);
@@ -96,6 +109,8 @@ int main() {
     float Left_PaddleY = Left_Paddle.getPosition().y;
 
     float speed = 10.f;
+
+    std::vector<Particle> particles;
 
     while (window.isOpen()) {
         while (const auto event = window.pollEvent()) {
@@ -178,6 +193,31 @@ int main() {
                 velocity.y = 10.f;
             }
 
+            for (int i = 0; i < 20; i++) {
+                Particle particle;
+
+                particle.Particles.setRadius(RandomParticleRadius);
+                particle.Particles.setPosition(Ball.getPosition());
+
+                particle.velocity = {
+                    static_cast<float>(rand() % 20 - 10),
+                    static_cast<float>(rand() & 20 - 10)
+                };
+
+                particle.lifetime = 69.f;
+                particle.push_back(particle);
+        }
+
+        for (auto it = particles.begin(); it != particles.end();) {
+            it->Particles.move(it->velocity);
+            it->lifetime--;
+
+            if (it->lifetime <=0) {
+                it = particles.erase(it);
+
+            } else {
+                ++it;
+            }
         }
 
         if (Ball.getGlobalBounds().findIntersection(Right_Paddle.getGlobalBounds())) {
@@ -214,11 +254,16 @@ int main() {
            window.draw(Right_Paddle);
            window.draw(Ball);
            window.draw(BackButton);
+
+           for (const Particle& particle : particles) {
+               window.draw(particle.Particles);
+           }
+
            Ball.move(velocity);
         }
 
         window.display();
     }
 
-    return 0;
+    return 0;}
 }
