@@ -205,7 +205,7 @@ int main() {
                 };
 
                 particle.lifetime = 69.f;
-                particle.push_back(particle);
+                particles.push_back(particle);
         }
 
         for (auto it = particles.begin(); it != particles.end();) {
