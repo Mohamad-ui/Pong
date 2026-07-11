@@ -89,6 +89,12 @@ int main() {
 
     StudioProfileArt.setScale({0.3f, 0.3f});
 
+    float LeftZoneHeight = Left_Paddle.getSize().y / 3.f;
+    float RightZoneHeight = Right_Paddle.getSize().y / 3.f;
+    float BallY= Ball.getPosition().y;
+    float Right_PaddleY = Right_Paddle.getPosition().y;
+    float Left_PaddleY = Left_Paddle.getPosition().y;
+
     float speed = 10.f;
 
     while (window.isOpen()) {
@@ -161,11 +167,32 @@ int main() {
         }
 
         if (Ball.getGlobalBounds().findIntersection(Left_Paddle.getGlobalBounds())) {
-            velocity.x = std::abs(velocity.x); 
+            velocity.x = std::abs(velocity.x);
+            if (BallY < Left_PaddleY + LeftZoneHeight) {
+                velocity.y = -10.f;
+
+            } else if (BallY < Left_PaddleY + 2 * LeftZoneHeight) {
+                velocity.y = 0.f;
+
+            } else {
+                velocity.y = 10.f;
+            }
+
         }
 
         if (Ball.getGlobalBounds().findIntersection(Right_Paddle.getGlobalBounds())) {
-            velocity.x = -std::abs(velocity.x); 
+            velocity.x = -std::abs(velocity.x);
+            if (BallY < Right_PaddleY + RightZoneHeight) {
+                velocity.y = -10.f;
+
+            } else if (BallY < Right_PaddleY + 2 * RightZoneHeight) {
+                velocity.y = 0.f;
+
+            } else {
+                velocity.y = 10.f;
+            }
+
+
         }
 
         window.clear();
