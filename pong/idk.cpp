@@ -13,6 +13,7 @@
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <cstdlib>
+#include <cwchar>
 #include <random>
 #include <iterator>
 #include <optional>
@@ -37,7 +38,7 @@ struct Particle {
 int main() {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> distrib(0.3, 2.0);
+    std::uniform_real_distribution<float> distrib(0.3f, 2.0f);
     int RandomParticleRadius = distrib(gen);
 
     GameState state = GameState::Menu;
@@ -55,8 +56,8 @@ int main() {
         println("Failed to load font VT323");
     }
 
-    sf::RectangleShape Right_Paddle({10.f, 100.f});
-    Right_Paddle.setPosition({780.f, 380.f});
+    sf::RectangleShape Right_Paddle({10.f, 800.f});
+    Right_Paddle.setPosition({780.f, 0.f});
     Right_Paddle.setFillColor(sf::Color::Blue);
 
     sf::RectangleShape Left_Paddle({10.f, 100.f});
@@ -64,28 +65,34 @@ int main() {
     Left_Paddle.setFillColor(sf::Color::Blue);
 
     sf::Text PlayButton(font);
-    PlayButton.setString("std::Play");
+    PlayButton.setString("std::Play();");
     PlayButton.setCharacterSize(24);
-    PlayButton.setFillColor(sf::Color::White);
-    PlayButton.setPosition({650.f, 250.f});
+    PlayButton.setFillColor(sf::Color::Green);
+    PlayButton.setPosition({620.f, 250.f});
 
     sf::Text BackButton(font);
     BackButton.setCharacterSize(24);
-    BackButton.setString(">");
-    BackButton.setPosition({5.f, 5.f});
+    BackButton.setString("return 0;");
+    BackButton.setPosition({5.f, 10.f});
     BackButton.setFillColor(sf::Color::White);
 
+    sf::Text EndButton(font);
+    EndButton.setString("etl::End();");
+    EndButton.setCharacterSize(24);
+    EndButton.setFillColor(sf::Color::Red);
+    EndButton.setPosition({620.f, 350.f});
+
     sf::Text TitleText(font);
-    TitleText.setString("#Include <Pong>");
+    TitleText.setString("#include <pong.hpp>");
     TitleText.setCharacterSize(48);
     TitleText.setFillColor(sf::Color::White);
     TitleText.setPosition({170.f, 100.f});
 
     sf::Text CreditsButton(font);
-    CreditsButton.setString("sf::Credits");
+    CreditsButton.setString("glm::Credits();");
     CreditsButton.setCharacterSize(24);
     CreditsButton.setFillColor(sf::Color::White);
-    CreditsButton.setPosition({650.f, 300.f});
+    CreditsButton.setPosition({620.f, 300.f});
 
     sf::Sprite StudioProfileArt(texture);
     StudioProfileArt.setPosition({200.f, 200.f}); 
@@ -102,17 +109,18 @@ int main() {
 
     StudioProfileArt.setScale({0.3f, 0.3f});
 
-    float LeftZoneHeight = Left_Paddle.getSize().y / 3.f;
-    float RightZoneHeight = Right_Paddle.getSize().y / 3.f;
-    float BallY= Ball.getPosition().y;
-    float Right_PaddleY = Right_Paddle.getPosition().y;
-    float Left_PaddleY = Left_Paddle.getPosition().y;
-
     float speed = 10.f;
 
     std::vector<Particle> particles;
 
     while (window.isOpen()) {
+
+        float LeftZoneHeight = Left_Paddle.getSize().y / 3.f;
+        float RightZoneHeight = Right_Paddle.getSize().y / 3.f;
+        float BallY= Ball.getPosition().y;
+        float Right_PaddleY = Right_Paddle.getPosition().y;
+        float Left_PaddleY = Left_Paddle.getPosition().y;
+
         while (const auto event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
@@ -149,6 +157,13 @@ int main() {
                 }
             }
 
+            if (state == GameState::Menu && event->is<sf::Event::MouseButtonPressed>()) {
+                auto mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                if (EndButton.getGlobalBounds().contains(mousePosition)) {
+                   window.close(); 
+                }
+            }
+
             if (state == GameState::Credits && event->is<sf::Event::MouseButtonPressed>()) {
                 auto mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                 if (BackButton.getGlobalBounds().contains(mousePosition)) {
@@ -163,8 +178,7 @@ int main() {
                 }
             }
         }
-
-
+        
         if (Ball.getPosition().x < 0) {
             window.close();
         }
@@ -196,28 +210,18 @@ int main() {
             for (int i = 0; i < 20; i++) {
                 Particle particle;
 
-                particle.Particles.setRadius(RandomParticleRadius);
+                particle.Particles.setRadius(distrib(gen));
                 particle.Particles.setPosition(Ball.getPosition());
 
                 particle.velocity = {
                     static_cast<float>(rand() % 20 - 10),
-                    static_cast<float>(rand() & 20 - 10)
+                    static_cast<float>(rand() % 20 - 10)
                 };
 
-                particle.lifetime = 69.f;
+                particle.lifetime = 10.f;
                 particles.push_back(particle);
         }
 
-        for (auto it = particles.begin(); it != particles.end();) {
-            it->Particles.move(it->velocity);
-            it->lifetime--;
-
-            if (it->lifetime <=0) {
-                it = particles.erase(it);
-
-            } else {
-                ++it;
-            }
         }
 
         if (Ball.getGlobalBounds().findIntersection(Right_Paddle.getGlobalBounds())) {
@@ -236,11 +240,24 @@ int main() {
         }
 
         window.clear();
+        for (auto it = particles.begin(); it != particles.end();) {
+            it->Particles.move(it->velocity);
+            it->lifetime--;
+
+            if (it->lifetime <=0) {
+                it = particles.erase(it);
+
+            } else {
+                ++it;
+            }
+        }
+ 
 
         if (state == GameState::Menu) {
            window.draw(PlayButton); 
            window.draw(CreditsButton);
            window.draw(TitleText);
+           window.draw(EndButton); 
         }
 
         if (state == GameState::Credits) {
@@ -265,5 +282,5 @@ int main() {
         window.display();
     }
 
-    return 0;}
+    return 0;
 }
