@@ -67,7 +67,7 @@ int main() {
     sf::Text PlayButton(font);
     PlayButton.setString("std::Play();");
     PlayButton.setCharacterSize(24);
-    PlayButton.setFillColor(sf::Color::Green);
+    PlayButton.setFillColor(sf::Color::White);
     PlayButton.setPosition({620.f, 250.f});
 
     sf::Text BackButton(font);
@@ -79,7 +79,7 @@ int main() {
     sf::Text EndButton(font);
     EndButton.setString("etl::End();");
     EndButton.setCharacterSize(24);
-    EndButton.setFillColor(sf::Color::Red);
+    EndButton.setFillColor(sf::Color::White);
     EndButton.setPosition({620.f, 350.f});
 
     sf::Text TitleText(font);
