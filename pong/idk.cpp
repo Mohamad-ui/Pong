@@ -26,6 +26,7 @@ enum class GameState {
     Settings,
     Credits,
     Donate,
+    EndButtonConfirm,
     Paused
 };
 
@@ -76,11 +77,35 @@ int main() {
     BackButton.setPosition({5.f, 10.f});
     BackButton.setFillColor(sf::Color::White);
 
+    sf::RectangleShape EndButtonConfirmBox({320.f, 550.f});
+    EndButtonConfirmBox.setPosition({320.f, 550.f});
+    EndButtonConfirmBox.setFillColor(sf::Color::Black);
+    EndButtonConfirmBox.setOutlineThickness(-3.f);
+    EndButtonConfirmBox.setOutlineColor(sf::Color::White);
+
+    sf::Text EndButtonConfirmText(font);
+    EndButtonConfirmText.setString("you want to exit?");
+    EndButtonConfirmText.setCharacterSize(24);
+    EndButtonConfirmText.setFillColor(sf::Color::White);
+    EndButtonConfirmText.setPosition({360.f, 355.f});
+
     sf::Text EndButton(font);
     EndButton.setString("etl::End();");
     EndButton.setCharacterSize(24);
     EndButton.setFillColor(sf::Color::White);
     EndButton.setPosition({620.f, 350.f});
+
+    sf::Text EndButtonYes(font);
+    EndButtonYes.setString("Yes");
+    EndButtonYes.setCharacterSize(18);
+    EndButtonYes.setFillColor(sf::Color::White);
+    EndButtonYes.setPosition({480.f, 350.f});
+
+    sf::Text EndButtonNo(font);
+    EndButtonNo.setString("Nah");
+    EndButtonNo.setCharacterSize(18);
+    EndButtonNo.setFillColor(sf::Color::White);
+    EndButtonNo.setPosition({480.f, 600.f});
 
     sf::Text TitleText(font);
     TitleText.setString("#include <pong.hpp>");
@@ -160,7 +185,21 @@ int main() {
             if (state == GameState::Menu && event->is<sf::Event::MouseButtonPressed>()) {
                 auto mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                 if (EndButton.getGlobalBounds().contains(mousePosition)) {
-                   window.close(); 
+                   state = GameState::EndButtonConfirm; 
+                }
+            }
+
+			if (state == GameState::EndButtonConfirm && event->is<sf::Event::MouseButtonPressed>()) {
+                auto mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                if (EndButtonYes.getGlobalBounds().contains(mousePosition)) {
+                    window.close(); 
+                }
+			}
+
+            if (state == GameState::EndButtonConfirm && event->is<sf::Event::MouseButtonPressed>()) {
+                auto mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                if (EndButtonNo.getGlobalBounds().contains(mousePosition)) {
+                    state = GameState::Menu;
                 }
             }
 
@@ -264,6 +303,13 @@ int main() {
             window.draw(CreditsText);
             window.draw(StudioProfileArt);
             window.draw(BackButton);
+        }
+
+        if (state == GameState::EndButtonConfirm) {
+            window.draw(EndButtonConfirmBox);
+            window.draw(EndButtonYes);
+            window.draw(EndButtonNo);
+            window.draw(EndButtonConfirmText);
         }
 
         if (state == GameState::Playing) {
