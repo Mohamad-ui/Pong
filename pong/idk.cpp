@@ -1,7 +1,7 @@
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/System/Vector2.hpp>
 #include "SFML/Graphics/Texture.hpp"
-#include "UTILS.hpp"
+#include "utils.hpp"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -77,8 +77,8 @@ int main() {
     BackButton.setPosition({5.f, 10.f});
     BackButton.setFillColor(sf::Color::White);
 
-    sf::RectangleShape EndButtonConfirmBox({320.f, 550.f});
-    EndButtonConfirmBox.setPosition({320.f, 550.f});
+    sf::RectangleShape EndButtonConfirmBox({320.f, 150.f});
+    EndButtonConfirmBox.setPosition({240.f, 300.f});
     EndButtonConfirmBox.setFillColor(sf::Color::Black);
     EndButtonConfirmBox.setOutlineThickness(-3.f);
     EndButtonConfirmBox.setOutlineColor(sf::Color::White);
@@ -87,7 +87,7 @@ int main() {
     EndButtonConfirmText.setString("you want to exit?");
     EndButtonConfirmText.setCharacterSize(24);
     EndButtonConfirmText.setFillColor(sf::Color::White);
-    EndButtonConfirmText.setPosition({360.f, 355.f});
+    EndButtonConfirmText.setPosition({305.f, 325.f});
 
     sf::Text EndButton(font);
     EndButton.setString("etl::End();");
@@ -99,7 +99,7 @@ int main() {
     EndButtonYes.setString("Yes");
     EndButtonYes.setCharacterSize(18);
     EndButtonYes.setFillColor(sf::Color::White);
-    EndButtonYes.setPosition({480.f, 350.f});
+    EndButtonYes.setPosition({305.f, 405.f});
 
     sf::Text EndButtonNo(font);
     EndButtonNo.setString("Nah");
@@ -292,37 +292,39 @@ int main() {
         }
  
 
-        if (state == GameState::Menu) {
-           window.draw(PlayButton); 
-           window.draw(CreditsButton);
-           window.draw(TitleText);
-           window.draw(EndButton); 
-        }
+        switch (state) {
+            case GameState::Menu:
+                window.draw(PlayButton);
+                window.draw(CreditsButton);
+                window.draw(TitleText);
+                window.draw(EndButton);
+                break;
 
-        if (state == GameState::Credits) {
-            window.draw(CreditsText);
-            window.draw(StudioProfileArt);
-            window.draw(BackButton);
-        }
+            case GameState::Credits:
+                window.draw(CreditsText);
+                window.draw(StudioProfileArt);
+                window.draw(BackButton);
+                break;
 
-        if (state == GameState::EndButtonConfirm) {
-            window.draw(EndButtonConfirmBox);
-            window.draw(EndButtonYes);
-            window.draw(EndButtonNo);
-            window.draw(EndButtonConfirmText);
-        }
+            case GameState::Playing:
+                window.draw(Left_Paddle);
+                window.draw(Right_Paddle);
+                window.draw(Ball);
+                window.draw(BackButton);
 
-        if (state == GameState::Playing) {
-           window.draw(Left_Paddle);
-           window.draw(Right_Paddle);
-           window.draw(Ball);
-           window.draw(BackButton);
+                for (const Particle& particle : particles) {
+                    window.draw(particle.Particles);
+                }
 
-           for (const Particle& particle : particles) {
-               window.draw(particle.Particles);
-           }
+                Ball.move(velocity);
+                break;
 
-           Ball.move(velocity);
+            case GameState::EndButtonConfirm:
+                window.draw(EndButtonConfirmBox);
+                window.draw(EndButtonYes);
+                window.draw(EndButtonNo);
+                window.draw(EndButtonConfirmText);
+ 
         }
 
         window.display();
